@@ -1,7 +1,7 @@
 <?php
 include_once 'functions.php';
 if (isset($_POST['user'])) {
-	$user=sanitizeString($_POST['user']);
+	$user=sanitizeString($conn,$_POST['user']);
 
 	if (mysql_num_rows(queryMySql("SELECT * FROM `members` WHERE `user`='$user'"))) {
 		echo "<span class='taken'>&nbsp;&#x2718; Sorry this username is taken</span>";

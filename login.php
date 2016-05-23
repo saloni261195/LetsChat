@@ -1,29 +1,32 @@
 <?php // login.php
 include_once 'header.php';
 echo "<div class='main'><h3>Please enter your details to log in</h3>";
-$error = $user = $pass = "";
+$error = $user = $pass =$fname= "";
 if (isset($_POST['user']))
 {
-$user = sanitizeString($_POST['user']);
-$pass = sanitizeString($_POST['pass']);
+$user = sanitizeString($conn,$_POST['user']);
+$pass = sanitizeString($conn,$_POST['pass']);
 	if ($user == "" || $pass == "")
 	{
 	$error = "All fields are compulsory.<br />";
 	}
 	else
 	{
-	$query = "SELECT `user`,`pass` FROM `members`
+	$query = "SELECT `user`,`pass`,`fname` FROM `members`
 	WHERE `user`='$user' AND `pass`='$pass'";
 	}
 
-	if (mysql_num_rows(queryMysql($query)) == 0)
+	if (queryMysql($conn,$query)->num_rows== 0)
 	{
 	$error = "<span class='error'>Username/Password invalid</span><br /><br />";
 	}
 	else
 	{
+	$row = mysqli_fetch_row(queryMysql($conn,$query));
 	$_SESSION['user'] = $user;
 	$_SESSION['pass'] = $pass;
+	$_SESSION['fname']=$row[2];
+
 	die("You are now logged in. Please <a href='members.php?view=$user'>" .
 	"click here</a> to continue.<br /><br />");
 	}

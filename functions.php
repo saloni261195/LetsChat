@@ -5,15 +5,15 @@ $appname='Lets Chat';
 $pass='';
 $database='login';
 
-mysql_connect($dbhost,$user,$pass) or die(mysql_error());
-mysql_select_db($database) or die(mysql_error());
+$conn=mysqli_connect($dbhost,$user,$pass) or die(mysqli_error());
+mysqli_select_db($conn,$database) or die(mysqli_error());
 
-function createTable($name,$query){
-	queryMySql("CREATE TABLE IF NOT EXISTS $name($query)");
+function createTable($conn,$name,$query){
+	queryMySql($conn,"CREATE TABLE IF NOT EXISTS $name($query)");
 	echo "Table ".$name. " created or already exists.<br/>";
 }
-function queryMySql($query){
-	$result=mysql_query($query) or die(mysql_error());
+function queryMySql($conn,$query){
+	$result=mysqli_query($conn,$query) or die(mysqli_error($conn));
 	return $result;
 }
 function destroySession(){
@@ -24,21 +24,22 @@ function destroySession(){
 	}
 }
 
-function sanitizeString($var){
+function sanitizeString($conn,$var){
 	$var=strip_tags($var);
 	$var=htmlentities($var);
 	$var=stripslashes($var);
-	return mysql_real_escape_string($var);
+	return mysqli_real_escape_string($conn,$var);
 }
 
-function showProfile($user){
+function showProfile($conn,$user){
 	if (file_exists($user.".jpg")) {
-		echo "<img src= $user.jpg align='left'/>";
+		echo "<img src= $user.jpg id='profile'/> <br/>";
 	}
-	$result=queryMySql("SELECT * FROM `profiles` WHERE `user`='$user'");
-	if (mysql_num_rows($result)) {
-		$row=mysql_fetch_row($result);
-		echo stripslashes($row[1])."<br clear=left/> <br/>";
+	$result=queryMySql($conn,"SELECT * FROM `profiles` WHERE `user`='$user'");
+	if ($result->num_rows) {
+		$row=mysqli_fetch_row($result);
+		echo "<span id='blue' > ".$user."</span> <br/>";
+		echo "<span id='pink'>".stripslashes($row[2])."</span><br/>";
 	}
 	
 }

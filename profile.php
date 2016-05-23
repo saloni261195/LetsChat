@@ -4,20 +4,20 @@ if (!$loggedin) die();
 echo "<div class='main'><h3>Your Profile</h3>";
 if (isset($_POST['text']))
 {
-	$text = sanitizeString($_POST['text']);
+	$text = sanitizeString($conn,$_POST['text']);
 	$text = preg_replace('/\s\s+/', ' ', $text);
-	if (mysql_num_rows(queryMysql("SELECT * FROM `profiles` WHERE `user`='$user'")))
-		queryMysql("UPDATE `profiles` SET `text`='$text' where `user`='$user'");
+	if ((queryMysql($conn,"SELECT * FROM `profiles` WHERE `user`='$user'"))->num_rows)
+		queryMysql($conn,"UPDATE `profiles` SET `text`='$text' where `user`='$user'");
 	else 
-		queryMysql("INSERT INTO `profiles` VALUES('$user', '$text')");
+		queryMysql($conn,"INSERT INTO `profiles` VALUES(NULL,'$user', '$text')");
 }
 else
 {
-	$result = queryMysql("SELECT * FROM `profiles` WHERE `user`='$user'");
+	$result = queryMysql($conn,"SELECT * FROM `profiles` WHERE `user`='$user'");
 
-	if (mysql_num_rows($result))
+	if ($result->num_rows)
 	{
-	$row = mysql_fetch_row($result);
+	$row = mysqli_fetch_row($result);
 	$text = stripslashes($row[1]);
 	}
 	else $text = "";
@@ -66,8 +66,10 @@ if (isset($_FILES['image']['name'])){
 	}
 }
 
-showProfile($user);
+showProfile($conn,$user,$fname);
 echo <<<_END
+</div>
+<div class='right_panel'>
 <form method='post' action='profile.php' enctype='multipart/form-data'>
 <h3>Enter or edit your details and/or upload an image</h3>
 <textarea name='text' cols='50' rows='3'>$text</textarea><br />

@@ -1,7 +1,7 @@
 <?php // friends.php
 include_once 'header.php';
 if (!$loggedin) die();
-if (isset($_GET['view'])) $view = sanitizeString($_GET['view']);
+if (isset($_GET['view'])) $view = sanitizeString($conn,$_GET['view']);
 else
 $view = $user;
 if ($view ==$user)
@@ -19,19 +19,19 @@ echo "<div class='main'>";
 
 $followers = array();
 $following = array();
-$result = queryMysql("SELECT * FROM `friends` WHERE `user`='$view'");
-$num= mysql_num_rows($result);
+$result = queryMysql($conn,"SELECT * FROM `friends` WHERE `user`='$view'");
+$num= $result->num_rows;
 for ($j = 0 ; $j < $num ; ++$j)
 {
-$row= mysql_fetch_row($result);
-$followers[$j] = $row[1];
+$row= mysqli_fetch_row($result);
+$followers[$j] = $row[2];
 }
-$result = queryMysql("SELECT * FROM `friends` WHERE `friend`='$view'");
-$num= mysql_num_rows($result);
+$result = queryMysql($conn,"SELECT * FROM `friends` WHERE `friend`='$view'");
+$num= $result->num_rows;
 for ($j = 0 ; $j < $num ; ++$j)
 {
-$row= mysql_fetch_row($result);
-$following[$j] = $row[0];
+$row= mysqli_fetch_row($result);
+$following[$j] = $row[1];
 }
 $mutual=array_intersect($followers, $following);
 $followers=array_diff($followers, $mutual);
@@ -63,6 +63,6 @@ if (sizeof($following))
 	$friends = TRUE;
 }
 if (!$friends) echo "<br />You don't have any friends yet.<br /><br />";
-	echo "<a class='button' href='messages.php?view=$view'>" ."View $name2 messages</a>";
+	echo "<a  href='messages.php?view=$view'>" ."<Button class='button'> View $name2 messages </Button></a>";
 ?>
 </div><br /></body></html>
